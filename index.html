@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 赋能语文复习 — 初二期末备考</title>
+
+    <!-- Fonts: Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Notebook Tabs — Editorial, organized, warm
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-outer: #2d2d2d;
+            --bg-page: #f8f6f1;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555;
+            --text-muted: #999;
+            --accent-ai: #6366f1;
+
+            /* Tab colors */
+            --tab-1: #98d4bb; /* Mint */
+            --tab-2: #c7b8ea; /* Lavender */
+            --tab-3: #f4b8c5; /* Pink */
+            --tab-4: #a8d8ea; /* Sky */
+            --tab-5: #ffe6a7; /* Cream */
+
+            /* Typography */
+            --font-display: 'Bodoni Moda', 'Noto Serif SC', serif;
+            --font-body: 'DM Sans', 'Noto Serif SC', sans-serif;
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           BASE RESET
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===========================================
+           FIXED 16:9 STAGE: MANDATORY BASE STYLES
+           Include this ENTIRE file in every presentation.
+           Slides are authored at 1920×1080 and scaled as a whole.
+           =========================================== */
+
+        /* 1. Lock the browser viewport */
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: var(--bg-outer);
+        }
+
+        /* 2. Full-window deck viewport */
+        .deck-viewport {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background: var(--bg-outer);
+        }
+
+        /* 3. Fixed 16:9 design canvas.
+           JavaScript sets transform: translate(...) scale(...). */
+        .deck-stage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+            background: var(--bg-outer);
+        }
+
+        /* 4. Slides stack inside the fixed stage.
+           Content must be laid out at 1920×1080, not reflowed per device. */
+        .slide {
+            position: absolute;
+            inset: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            display: block;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            background: var(--bg-outer);
+        }
+
+        .slide.active,
+        .slide.visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        /* 5. Keep media inside authored slide bounds */
+        img,
+        video,
+        canvas,
+        svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* 6. Presentation chrome stays outside the slide design system */
+        .deck-controls {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        /* 7. Print one fixed-size slide per page */
+        @media print {
+            html,
+            body {
+                width: 1920px;
+                height: auto;
+                overflow: visible;
+                background: #fff;
+            }
+
+            .deck-viewport {
+                position: static;
+                overflow: visible;
+                background: #fff;
+            }
+
+            .deck-stage {
+                position: static;
+                width: auto;
+                height: auto;
+                transform: none !important;
+                background: none;
+            }
+
+            .slide {
+                position: relative;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                width: 1920px;
+                height: 1080px;
+                break-after: page;
+                page-break-after: always;
+            }
+
+            .slide:last-child {
+                break-after: auto;
+                page-break-after: auto;
+            }
+
+            .deck-controls {
+                display: none !important;
+            }
+        }
+
+        /* 8. Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+        }
+
+        /* ===========================================
+           NOTEBOOK TABS — SHARED SLIDE STYLES
+           =========================================== */
+
+        /* Paper container for every slide */
+        .paper {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 1500px;
+            min-height: 820px;
+            background: var(--bg-page);
+            border-radius: 4px;
+            box-shadow: 0 8px 60px rgba(0,0,0,0.35);
+            padding: 70px 90px 70px 110px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Binder holes on left */
+        .paper::before {
+            content: '';
+            position: absolute;
+            left: 28px; top: 0; bottom: 0;
+            width: 3px;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 90px,
+                #ccc 90px,
+                #ccc 92px,
+                transparent 92px,
+                transparent 180px
+            );
+        }
+
+        /* Ring holes */
+        .binder-holes {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 160px;
+        }
+
+        .binder-hole {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 3px solid #bbb;
+            background: var(--bg-outer);
+        }
+
+        /* Colorful tabs on right edge */
+        .tabs {
+            position: absolute;
+            right: -6px; top: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            padding: 50px 0;
+            z-index: 10;
+        }
+
+        .tab {
+            width: 44px;
+            border-radius: 0 5px 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(0,0,0,0.45);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: width 0.2s ease;
+        }
+
+        .tab:hover { width: 52px; }
+        .tab.active { width: 56px; font-weight: 600; color: rgba(0,0,0,0.7); }
+
+        .tab:nth-child(1) { background: var(--tab-1); height: 75px; }
+        .tab:nth-child(2) { background: var(--tab-2); height: 75px; }
+        .tab:nth-child(3) { background: var(--tab-3); height: 75px; }
+        .tab:nth-child(4) { background: var(--tab-4); height: 75px; }
+        .tab:nth-child(5) { background: var(--tab-5); height: 75px; }
+
+        /* Top decoration line */
+        .paper-top-rule {
+            position: absolute;
+            top: 30px; left: 90px; right: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, var(--tab-3), transparent 60%);
+        }
+
+        /* Page indicator */
+        .page-indicator {
+            position: absolute;
+            bottom: 30px; right: 80px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* ===========================================
+           REVEAL ANIMATIONS
+           Trigger via .visible class on the active slide
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(25px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide.visible .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .slide.visible .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .slide.visible .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .slide.visible .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .slide.visible .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .slide.visible .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        /* Scale-in variant */
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal-scale {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ===========================================
+           SLIDE 1: TITLE
+           =========================================== */
+        .title-slide .paper {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-slide .main-title {
+            font-family: var(--font-display);
+            font-size: 80px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .title-slide .main-title .ai {
+            color: var(--accent-ai);
+            font-style: italic;
+        }
+
+        .title-slide .title-sub {
+            font-family: var(--font-body);
+            font-size: 26px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .title-slide .title-meta {
+            font-family: var(--font-body);
+            font-size: 16px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+        }
+
+        /* Decorative dots */
+        .title-dots {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 36px;
+        }
+
+        .title-dots span {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+
+        .title-dots span:nth-child(1) { background: var(--tab-1); }
+        .title-dots span:nth-child(2) { background: var(--tab-2); }
+        .title-dots span:nth-child(3) { background: var(--tab-3); }
+        .title-dots span:nth-child(4) { background: var(--tab-4); }
+        .title-dots span:nth-child(5) { background: var(--tab-5); }
+
+        /* ===========================================
+           CONTENT SLIDES — SHARED
+           =========================================== */
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-header h2 {
+            font-family: var(--font-display);
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .slide-header .section-label {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-ai);
+            margin-bottom: 12px;
+        }
+
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .divider-line {
+            width: 60px;
+            height: 3px;
+            border-radius: 2px;
+            margin: 16px 0 28px;
+        }
+
+        .divider-mint { background: var(--tab-1); }
+        .divider-lavender { background: var(--tab-2); }
+        .divider-pink { background: var(--tab-3); }
+        .divider-sky { background: var(--tab-4); }
+        .divider-cream { background: var(--tab-5); }
+
+        /* Bullet points */
+        .points {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .points li {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            font-family: var(--font-body);
+            font-size: 26px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .points .bullet {
+            flex-shrink: 0;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+
+        .bullet-mint { background: var(--tab-1); }
+        .bullet-lavender { background: var(--tab-2); }
+        .bullet-pink { background: var(--tab-3); }
+        .bullet-sky { background: var(--tab-4); }
+        .bullet-cream { background: var(--tab-5); }
+
+        /* Cards grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.03);
+            border-radius: 12px;
+            padding: 28px 32px;
+            border-left: 4px solid transparent;
+        }
+
+        .card h3 {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-family: var(--font-body);
+            font-size: 20px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .card:nth-child(1) { border-left-color: var(--tab-1); }
+        .card:nth-child(2) { border-left-color: var(--tab-2); }
+        .card:nth-child(3) { border-left-color: var(--tab-3); }
+        .card:nth-child(4) { border-left-color: var(--tab-4); }
+
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        .col-title {
+            font-family: var(--font-display);
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .col-items {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .col-items li {
+            font-family: var(--font-body);
+            font-size: 22px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .col-items li::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 10px;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--tab-3);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(152, 212, 187, 0.15), rgba(168, 216, 234, 0.15));
+            border-radius: 12px;
+            padding: 28px 36px;
+            margin-top: 24px;
+            border: 1px solid rgba(152, 212, 187, 0.3);
+        }
+
+        .highlight-box p {
+            font-family: var(--font-body);
+            font-size: 22px;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        .highlight-box .icon {
+            font-size: 28px;
+            margin-right: 10px;
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            bottom: 0; left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--tab-1), var(--tab-2), var(--tab-3), var(--tab-4), var(--tab-5));
+            transition: width 0.4s var(--ease-out-expo);
+            z-index: 1001;
+        }
+
+        /* ===========================================
+           EDIT MODE
+           =========================================== */
+        .edit-hotzone {
+            position: fixed;
+            top: 0; left: 0;
+            width: 80px; height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .edit-toggle {
+            position: fixed;
+            top: 16px; left: 16px;
+            width: 44px; height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-toggle.show,
+        .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .edit-toggle.active {
+            background: var(--accent-ai);
+        }
+
+        [contenteditable="true"] {
+            outline: 2px dashed rgba(99, 102, 241, 0.4);
+            outline-offset: 4px;
+            border-radius: 4px;
+            cursor: text;
+        }
+
+        [contenteditable="true"]:focus {
+            outline-color: var(--accent-ai);
+        }
+
+        /* ===========================================
+           NAV HINT
+           =========================================== */
+        .nav-hint {
+            position: fixed;
+            bottom: 16px; left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: rgba(255,255,255,0.35);
+            z-index: 999;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===========================================
+         DECK VIEWPORT & STAGE
+         =========================================== -->
+    <div class="deck-viewport">
+        <main class="deck-stage" id="deckStage">
+
+            <!-- =============================================
+                 SLIDE 1: TITLE
+                 ============================================= -->
+            <section class="slide title-slide active">
+                <div class="paper">
+                    <div class="binder-holes">
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab">文言文</div>
+                        <div class="tab">古诗词</div>
+                        <div class="tab">阅读</div>
+                        <div class="tab">写作</div>
+                        <div class="tab">名著</div>
+                    </div>
+                    <div class="paper-top-rule"></div>
+
+                    <div class="title-dots reveal">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <h1 class="main-title reveal"><span class="ai">AI</span> 赋能语文复习</h1>
+                    <p class="title-sub reveal">初二下学期 · 期末备考指南<br>人教版八年级下册核心考点梳理</p>
+                    <p class="title-meta reveal">2026 年春季学期 · 家长会专题</p>
+                </div>
+                <div class="page-indicator" style="position:fixed;bottom:16px;right:24px;font-family:var(--font-body);font-size:13px;color:rgba(255,255,255,0.3);z-index:999;">1 / 7</div>
+            </section>
+
+            <!-- =============================================
+                 SLIDE 2: WHY AI?
+                 ============================================= -->
+            <section class="slide">
+                <div class="paper">
+                    <div class="binder-holes">
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab active">文言文</div>
+                        <div class="tab">古诗词</div>
+                        <div class="tab">阅读</div>
+                        <div class="tab">写作</div>
+                        <div class="tab">名著</div>
+                    </div>
+                    <div class="paper-top-rule"></div>
+
+                    <div class="slide-header">
+                        <div class="section-label reveal">引言</div>
+                        <h2 class="reveal">为什么要用 AI 辅助复习？</h2>
+                        <div class="divider-line divider-mint reveal"></div>
+                    </div>
+
+                    <div class="slide-body">
+                        <div class="card-grid">
+                            <div class="card reveal">
+                                <h3>🎯 个性化学习</h3>
+                                <p>AI 能根据每个孩子的薄弱点，定制专属复习计划，不再"一刀切"</p>
+                            </div>
+                            <div class="card reveal">
+                                <h3>✍️ 智能批改</h3>
+                                <p>作文、阅读理解即时反馈，指出问题并给出改进建议</p>
+                            </div>
+                            <div class="card reveal">
+                                <h3>📚 知识梳理</h3>
+                                <p>自动整理本学期所有考点，生成思维导图和知识卡片</p>
+                            </div>
+                            <div class="card reveal">
+                                <h3>⚡ 效率提升</h3>
+                                <p>从"题海战术"到"精准练习"，用更少时间达到更好效果</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="page-indicator">2 / 7</div>
+                </div>
+            </section>
+
+            <!-- =============================================
+                 SLIDE 3: CORE TOPICS OVERVIEW
+                 ============================================= -->
+            <section class="slide">
+                <div class="paper">
+                    <div class="binder-holes">
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab">文言文</div>
+                        <div class="tab active">古诗词</div>
+                        <div class="tab">阅读</div>
+                        <div class="tab">写作</div>
+                        <div class="tab">名著</div>
+                    </div>
+                    <div class="paper-top-rule"></div>
+
+                    <div class="slide-header">
+                        <div class="section-label reveal">总览</div>
+                        <h2 class="reveal">本学期核心考点</h2>
+                        <div class="divider-line divider-lavender reveal"></div>
+                    </div>
+
+                    <div class="slide-body">
+                        <ul class="points">
+                            <li class="reveal">
+                                <span class="bullet bullet-mint">1</span>
+                                <span><strong>文言文阅读</strong> — 《桃花源记》《小石潭记》《核舟记》等重点篇目的翻译、理解与赏析</span>
+                            </li>
+                            <li class="reveal">
+                                <span class="bullet bullet-lavender">2</span>
+                                <span><strong>古诗词鉴赏</strong> — 《关雎》《蒹葭》《茅屋为秋风所破歌》等诗歌的情感与手法</span>
+                            </li>
+                            <li class="reveal">
+                                <span class="bullet bullet-pink">3</span>
+                                <span><strong>现代文阅读</strong> — 记叙文、说明文阅读理解的答题技巧与方法</span>
+                            </li>
+                            <li class="reveal">
+                                <span class="bullet bullet-sky">4</span>
+                                <span><strong>写作表达</strong> — 审题立意、素材积累、结构安排与语言润色</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="page-indicator">3 / 7</div>
+                </div>
+            </section>
+
+            <!-- =============================================
+                 SLIDE 4: 文言文 & 古诗词
+                 ============================================= -->
+            <section class="slide">
+                <div class="paper">
+                    <div class="binder-holes">
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab">文言文</div>
+                        <div class="tab active">古诗词</div>
+                        <div class="tab">阅读</div>
+                        <div class="tab">写作</div>
+                        <div class="tab">名著</div>
+                    </div>
+                    <div class="paper-top-rule"></div>
+
+                    <div class="slide-header">
+                        <div class="section-label reveal">板块一</div>
+                        <h2 class="reveal">文言文 & 古诗词复习</h2>
+                        <div class="divider-line divider-pink reveal"></div>
+                    </div>
+
+                    <div class="slide-body">
+                        <div class="two-col">
+                            <div class="reveal">
+                                <h3 class="col-title">📖 文言文重点</h3>
+                                <ul class="col-items">
+                                    <li>《桃花源记》— 虚实结合的理想社会</li>
+                                    <li>《小石潭记》— 借景抒情的写法</li>
+                                    <li>《核舟记》— 说明顺序与细节描写</li>
+                                    <li>重点虚词：之、其、以、而、乃</li>
+                                </ul>
+                            </div>
+                            <div class="reveal">
+                                <h3 class="col-title">🎵 古诗词重点</h3>
+                                <ul class="col-items">
+                                    <li>《关雎》《蒹葭》— 比兴手法</li>
+                                    <li>《茅屋为秋风所破歌》— 忧国忧民</li>
+                                    <li>《卖炭翁》— 对比与讽刺</li>
+                                    <li>常考题型：画面描绘、情感分析</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="highlight-box reveal">
+                            <p><span class="icon">🤖</span><strong>AI 怎么帮？</strong> 让 AI 逐句翻译文言文、生成思维导图、出模拟题，还能用故事化方式帮助理解记忆</p>
+                        </div>
+                    </div>
+
+                    <div class="page-indicator">4 / 7</div>
+                </div>
+            </section>
+
+            <!-- =============================================
+                 SLIDE 5: 现代文阅读 & 写作
+                 ============================================= -->
+            <section class="slide">
+                <div class="paper">
+                    <div class="binder-holes">
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab">文言文</div>
+                        <div class="tab">古诗词</div>
+                        <div class="tab active">阅读</div>
+                        <div class="tab">写作</div>
+                        <div class="tab">名著</div>
+                    </div>
+                    <div class="paper-top-rule"></div>
+
+                    <div class="slide-header">
+                        <div class="section-label reveal">板块二</div>
+                        <h2 class="reveal">现代文阅读 & 写作</h2>
+                        <div class="divider-line divider-sky reveal"></div>
+                    </div>
+
+                    <div class="slide-body">
+                        <div class="two-col">
+                            <div class="reveal">
+                                <h3 class="col-title">🔍 阅读理解</h3>
+                                <ul class="col-items">
+                                    <li>记叙文：概括内容、分析人物、理解主旨</li>
+                                    <li>说明文：说明方法、语言准确性</li>
+                                    <li>答题公式：手法 + 内容 + 效果</li>
+                                    <li>审题关键词：为什么、怎样、哪些</li>
+                                </ul>
+                            </div>
+                            <div class="reveal">
+                                <h3 class="col-title">✏️ 作文提升</h3>
+                                <ul class="col-items">
+                                    <li>审题三步法：抓关键词、定范围、明要求</li>
+                                    <li>结构模板：总分总、并列式、递进式</li>
+                                    <li>素材积累：时事热点、经典事例、名言警句</li>
+                                    <li>开头结尾技巧：引用、设问、排比</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="highlight-box reveal">
+                            <p><span class="icon">🤖</span><strong>AI 怎么帮？</strong> 输入作文题目，AI 提供审题指导、范文分析、修改建议；阅读题可以反复练习并获得详细解析</p>
+                        </div>
+                    </div>
+
+                    <div class="page-indicator">5 / 7</div>
+                </div>
+            </section>
+
+            <!-- =============================================
+                 SLIDE 6: 名著阅读
+                 ============================================= -->
+            <section class="slide">
+                <div class="paper">
+                    <div class="binder-holes">
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab">文言文</div>
+                        <div class="tab">古诗词</div>
+                        <div class="tab">阅读</div>
+                        <div class="tab">写作</div>
+                        <div class="tab active">名著</div>
+                    </div>
+                    <div class="paper-top-rule"></div>
+
+                    <div class="slide-header">
+                        <div class="section-label reveal">板块三</div>
+                        <h2 class="reveal">名著阅读</h2>
+                        <div class="divider-line divider-cream reveal"></div>
+                    </div>
+
+                    <div class="slide-body">
+                        <div class="two-col">
+                            <div class="reveal">
+                                <h3 class="col-title">📕《钢铁是怎样炼成的》</h3>
+                                <ul class="col-items">
+                                    <li>作者：奥斯特洛夫斯基</li>
+                                    <li>主人公：保尔·柯察金</li>
+                                    <li>核心主题：意志、信仰、成长</li>
+                                    <li>常考：经典情节、人物形象分析</li>
+                                </ul>
+                            </div>
+                            <div class="reveal">
+                                <h3 class="col-title">📗《傅雷家书》</h3>
+                                <ul class="col-items">
+                                    <li>作者：傅雷</li>
+                                    <li>类型：书信体散文</li>
+                                    <li>核心主题：家庭教育、艺术修养</li>
+                                    <li>常考：书信内容理解、思想感悟</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="highlight-box reveal">
+                            <p><span class="icon">🤖</span><strong>AI 怎么帮？</strong> 让 AI 生成人物关系图、情节时间线、考点速记卡片，还能模拟名著阅读理解题</p>
+                        </div>
+                    </div>
+
+                    <div class="page-indicator">6 / 7</div>
+                </div>
+            </section>
+
+            <!-- =============================================
+                 SLIDE 7: CLOSING
+                 ============================================= -->
+            <section class="slide title-slide">
+                <div class="paper">
+                    <div class="binder-holes">
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                        <div class="binder-hole"></div>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab">文言文</div>
+                        <div class="tab">古诗词</div>
+                        <div class="tab">阅读</div>
+                        <div class="tab">写作</div>
+                        <div class="tab">名著</div>
+                    </div>
+                    <div class="paper-top-rule"></div>
+
+                    <div class="title-dots reveal">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <h2 class="main-title reveal" style="font-size:64px;">复习建议</h2>
+                    <div class="divider-line divider-mint reveal" style="margin:16px auto 28px;"></div>
+
+                    <div class="card-grid reveal" style="max-width:1100px;margin:0 auto;">
+                        <div class="card">
+                            <h3>📅 每天 30 分钟</h3>
+                            <p>利用 AI 工具做针对性练习，不搞题海战术</p>
+                        </div>
+                        <div class="card">
+                            <h3>👨‍👩‍👧 亲子共读</h3>
+                            <p>和孩子一起读名著，讨论故事情节和人物</p>
+                        </div>
+                        <div class="card">
+                            <h3>📝 错题整理</h3>
+                            <p>让 AI 帮助归纳错题类型，重点突破薄弱环节</p>
+                        </div>
+                        <div class="card">
+                            <h3>💪 信心鼓励</h3>
+                            <p>相信每个孩子都有进步的空间，多鼓励少批评</p>
+                        </div>
+                    </div>
+
+                    <p class="title-meta reveal" style="margin-top:36px;font-size:20px;">
+                        感谢各位家长的支持与配合 · 祝同学们期末取得好成绩 🌟
+                    </p>
+                </div>
+                <div class="page-indicator" style="position:fixed;bottom:16px;right:24px;font-family:var(--font-body);font-size:13px;color:rgba(255,255,255,0.3);z-index:999;">7 / 7</div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Nav hint -->
+    <div class="nav-hint" id="navHint">← → 方向键翻页 · 空格下一页</div>
+
+    <!-- Edit mode -->
+    <div class="edit-hotzone" id="editHotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="编辑模式 (E)">✏️</button>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.stage = document.getElementById('deckStage');
+                this.progressBar = document.getElementById('progressBar');
+                this.navHint = document.getElementById('navHint');
+
+                this.setupStageScale();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupWheelNav();
+                this.showSlide(0);
+                this.hideNavHint();
+            }
+
+            /* --- Stage scaling: 1920×1080 → viewport --- */
+            setupStageScale() {
+                const scale = () => {
+                    const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+                    const x = (window.innerWidth - 1920 * factor) / 2;
+                    const y = (window.innerHeight - 1080 * factor) / 2;
+                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+                };
+                scale();
+                window.addEventListener('resize', scale);
+            }
+
+            /* --- Keyboard navigation --- */
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    // Skip if editing text
+                    if (e.target.getAttribute('contenteditable')) return;
+
+                    switch(e.key) {
+                        case 'ArrowRight':
+                        case 'ArrowDown':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowLeft':
+                        case 'ArrowUp':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.showSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.showSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+            }
+
+            /* --- Touch/swipe support --- */
+            setupTouchNav() {
+                let startX = 0, startY = 0;
+                const threshold = 50;
+
+                this.stage.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+
+                this.stage.addEventListener('touchend', (e) => {
+                    const dx = e.changedTouches[0].clientX - startX;
+                    const dy = e.changedTouches[0].clientY - startY;
+
+                    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold) {
+                        dx < 0 ? this.nextSlide() : this.prevSlide();
+                    }
+                }, { passive: true });
+            }
+
+            /* --- Mouse wheel navigation --- */
+            setupWheelNav() {
+                let lastWheel = 0;
+                document.addEventListener('wheel', (e) => {
+                    const now = Date.now();
+                    if (now - lastWheel < 600) return;
+                    lastWheel = now;
+
+                    if (e.deltaY > 0) this.nextSlide();
+                    else if (e.deltaY < 0) this.prevSlide();
+                }, { passive: true });
+            }
+
+            /* --- Slide visibility --- */
+            showSlide(index) {
+                this.currentSlide = Math.max(0, Math.min(index, this.totalSlides - 1));
+
+                this.slides.forEach((slide, i) => {
+                    const isActive = i === this.currentSlide;
+                    slide.classList.toggle('active', isActive);
+                    slide.classList.toggle('visible', isActive);
+                });
+
+                this.updateProgress();
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.showSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.showSlide(this.currentSlide - 1);
+                }
+            }
+
+            updateProgress() {
+                const pct = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                this.progressBar.style.width = pct + '%';
+            }
+
+            hideNavHint() {
+                setTimeout(() => {
+                    this.navHint.style.opacity = '0';
+                }, 4000);
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITING
+           =========================================== */
+        class InlineEditor {
+            constructor() {
+                this.isActive = false;
+                this.toggle = document.getElementById('editToggle');
+                this.hotzone = document.getElementById('editHotzone');
+                this.setupEvents();
+            }
+
+            setupEvents() {
+                // Toggle button click
+                this.toggle.addEventListener('click', () => this.toggleEditMode());
+
+                // Hotzone hover with 400ms grace period
+                let hideTimeout = null;
+
+                this.hotzone.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                    this.toggle.classList.add('show');
+                });
+
+                this.hotzone.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isActive) this.toggle.classList.remove('show');
+                    }, 400);
+                });
+
+                this.toggle.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                });
+
+                this.toggle.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isActive) this.toggle.classList.remove('show');
+                    }, 400);
+                });
+
+                // Hotzone direct click
+                this.hotzone.addEventListener('click', () => this.toggleEditMode());
+
+                // Keyboard shortcut E
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                        this.toggleEditMode();
+                    }
+                });
+
+                // Ctrl+S to save
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        this.saveToLocalStorage();
+                    }
+                });
+            }
+
+            toggleEditMode() {
+                this.isActive = !this.isActive;
+                this.toggle.classList.toggle('active', this.isActive);
+
+                // Make text elements editable
+                const editables = document.querySelectorAll(
+                    '.main-title, .title-sub, .title-meta, h2, h3, p, li span, .col-items li, .card p, .card h3'
+                );
+
+                editables.forEach(el => {
+                    el.setAttribute('contenteditable', this.isActive);
+                });
+            }
+
+            saveToLocalStorage() {
+                const content = document.querySelector('.deck-stage').innerHTML;
+                localStorage.setItem('frontend-slides-draft', content);
+                // Brief visual feedback
+                this.toggle.textContent = '✓';
+                setTimeout(() => { this.toggle.textContent = '✏️'; }, 1500);
+            }
+        }
+
+        /* ===========================================
+           INIT
+           =========================================== */
+        const presentation = new SlidePresentation();
+        const editor = new InlineEditor();
+    </script>
+</body>
+</html>
